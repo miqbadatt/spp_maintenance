@@ -3,7 +3,6 @@
 namespace App\Livewire\Admin\Kategori;
 
 use App\Models\KategoriSpp;
-use App\Models\KategoriSpp;
 use Livewire\Component;
 
 class Create extends Component
