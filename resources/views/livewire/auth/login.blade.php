@@ -40,7 +40,8 @@
                 <div class="logo-ring-outer">
                     <div class="logo-ring-inner">
                         <div class="logo-icon">
-                            <span class="logo-text">LT</span>
+                            <img src="/gambar/logo-pondok.png" alt="logo" class="logo-text"
+                                style="width: 100%; height: auto;">
                         </div>
                     </div>
                 </div>
@@ -109,8 +110,8 @@
                             placeholder="••••••••" autocomplete="current-password">
                         <div class="field-border"></div>
                         <button type="button" @click="showPassword = !showPassword" class="eye-btn">
-                            <svg x-show="!showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
+                            <svg x-show="!showPassword" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                                 <circle cx="12" cy="12" r="3" />
                             </svg>
