@@ -74,7 +74,7 @@
                     style="font-size: 16px; color: rgba(255,255,255,0.55); line-height: 1.8; margin: 24px 0 0;
                            max-width: 520px; opacity: 0; animation: fadeUp 0.7s 0.5s ease forwards;">
                     Platform pembayaran SPP digital untuk Pondok Pesantren
-                    <strong style="color: var(--em-300);">La-Taksal Panongan</strong>.
+                    <strong style="color: var(--em-300);">La Taksal Panongan</strong>.
                     Transparan, real-time, dan terpercaya.
                 </p>
 
