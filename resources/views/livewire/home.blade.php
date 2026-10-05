@@ -44,7 +44,7 @@
                 <div class="hero-badge" style="opacity: 0; animation: fadeUp 0.6s 0.2s ease forwards;">
                     <span
                         style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px;
-                                 border-radius: 999px; background: rgba(16,185,129,0.12);
+                                 border-radius: 999px; background: rgba(42, 32, 3, 0.12);
                                  border: 1px solid rgba(16,185,129,0.3); font-size: 11.5px;
                                  font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
                                  color: var(--em-300);">
