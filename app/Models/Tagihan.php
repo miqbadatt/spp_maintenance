@@ -19,7 +19,7 @@ class Tagihan extends Model
 
     public function kategori_spp()
     {
-        return $this->belongsTo(kategori_spp::class, 'id_kategori', 'id_kategori');
+        return $this->belongsTo(KategoriSpp::class, 'id_kategori', 'id_kategori');
     }
 
     public function pembayaran()

@@ -5,7 +5,7 @@ namespace App\Livewire\KepalaSekolah\Reports;
 use App\Models\Pembayaran;
 use App\Models\Siswa;
 use App\Models\Tagihan;
-use App\Models\kategori_spp;
+use App\Models\KategoriSpp;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -118,7 +118,7 @@ class Index extends Component
             ->paginate(15);
 
         // ── Support data ───────────────────────────────────────
-        $kategoris = kategori_spp::all();
+        $kategoris = KategoriSpp::all();
         $kelasList = Siswa::select('kelas')->distinct()->orderBy('kelas')->pluck('kelas');
         $bulanList = [
             'Januari',

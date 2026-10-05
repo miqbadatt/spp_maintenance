@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Kategori;
 
-use App\Models\kategori_spp as KategoriSpp;
+use App\Models\KategoriSpp;
 use Livewire\Component;
 
 class Edit extends Component

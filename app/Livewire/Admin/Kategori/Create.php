@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Kategori;
 
-use App\Models\kategori_spp;
+use App\Models\KategoriSpp;
 use App\Models\KategoriSpp;
 use Livewire\Component;
 
@@ -23,7 +23,7 @@ class Create extends Component
         ]);
 
         // 3. Simpan ke database
-        kategori_spp::create([
+        KategoriSpp::create([
             'tahun_ajaran' => $this->tahun_ajaran,
             'nominal_spp' => $this->nominal_spp,
         ]);

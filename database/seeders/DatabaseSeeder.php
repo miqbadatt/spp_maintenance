@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\kategori_spp;
+use App\Models\KategoriSpp;
 use App\Models\Pembayaran;
 use App\Models\Siswa;
 use App\Models\Tagihan;
@@ -53,12 +53,12 @@ class DatabaseSeeder extends Seeder
         //  2. KATEGORI SPP
         // ══════════════════════════════════════════
 
-        $kategori2025 = kategori_spp::create([
+        $kategori2025 = KategoriSpp::create([
             'tahun_ajaran' => '2025/2026',
             'nominal_spp'  => 250000,
         ]);
 
-        $kategori2026 = kategori_spp::create([
+        $kategori2026 = KategoriSpp::create([
             'tahun_ajaran' => '2026/2027',
             'nominal_spp'  => 275000,
         ]);

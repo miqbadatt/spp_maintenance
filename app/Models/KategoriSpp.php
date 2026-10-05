@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['tahun_ajaran', 'nominal_spp'])]
-class kategori_spp extends Model
+class KategoriSpp extends Model
 {
     protected $primaryKey = 'id_kategori';
 

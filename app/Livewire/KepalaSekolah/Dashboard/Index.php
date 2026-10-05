@@ -5,7 +5,7 @@ namespace App\Livewire\KepalaSekolah\Dashboard;
 use App\Models\Pembayaran;
 use App\Models\Siswa;
 use App\Models\Tagihan;
-use App\Models\kategori_spp;
+use App\Models\KategoriSpp;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -94,7 +94,7 @@ class Index extends Component
             ->get();
 
         // ── Kategori SPP aktif ─────────────────────────────────
-        $kategoris = kategori_spp::withCount('tagihan')->latest()->limit(4)->get();
+        $kategoris = KategoriSpp::withCount('tagihan')->latest()->limit(4)->get();
 
         return view('livewire.kepala-sekolah.dashboard.index', compact(
             'totalSiswa',

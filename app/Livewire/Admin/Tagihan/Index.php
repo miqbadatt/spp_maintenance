@@ -3,7 +3,7 @@
 namespace App\Livewire\Admin\Tagihan;
 
 use App\Mail\ReminderTagihanMail;
-use App\Models\kategori_spp;
+use App\Models\KategoriSpp;
 use App\Models\Siswa;
 use App\Models\Tagihan;
 use Illuminate\Support\Facades\Mail;
@@ -263,7 +263,7 @@ class Index extends Component
         /** @disregard P1005 */
         return view('livewire.admin.tagihan.index', [
             'tagihans'  => $query->paginate(10),
-            'kategoris' => kategori_spp::all(),
+            'kategoris' => KategoriSpp::all(),
             'siswas'    => Siswa::all(),
             'bulanList' => [
                 'Januari',

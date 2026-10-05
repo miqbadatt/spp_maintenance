@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Dashboard;
 
-use App\Models\kategori_spp;
+use App\Models\KategoriSpp;
 use App\Models\Pembayaran;
 use App\Models\Siswa;
 use App\Models\Tagihan;
@@ -83,7 +83,7 @@ class Index extends Component
             ->get();
 
         /** @disregard P1005 */
-        $kategoris = kategori_spp::latest()->take(5)->get();
+        $kategoris = KategoriSpp::latest()->take(5)->get();
 
         $persen = $potensi > 0 ? round(($terkumpul / $potensi) * 100, 1) : 0;
 

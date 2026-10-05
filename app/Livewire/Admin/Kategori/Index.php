@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Kategori;
 
-use App\Models\kategori_spp;
+use App\Models\KategoriSpp;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -13,7 +13,7 @@ class Index extends Component
     // Fungsi untuk menghapus kategori
     public function delete($id)
     {
-        $kategori = kategori_spp::findOrFail($id);
+        $kategori = KategoriSpp::findOrFail($id);
         $kategori->delete();
 
         session()->flash('message', 'Kategori SPP berhasil dihapus.');
@@ -22,7 +22,7 @@ class Index extends Component
     public function render()
     {
         /** @disregard P1005 */
-        $kategoris = kategori_spp::latest()->paginate(10);
+        $kategoris = KategoriSpp::latest()->paginate(10);
 
         return view('livewire.admin.kategori.index', [
             'kategoris' => $kategoris
