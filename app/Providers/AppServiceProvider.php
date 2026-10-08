@@ -22,9 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // if (app()->environment('local')) {
-        //     Mail::alwaysTo('miqbad@raharja.info');
-        // }
+        if (app()->environment('local')) {
+            Mail::alwaysTo('miqbad@raharja.info');
+        }
 
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
