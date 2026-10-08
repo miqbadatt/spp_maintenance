@@ -16,38 +16,22 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // ══════════════════════════════════════════
-        //  1. USERS
+        //  1. USERS (admin & kepala sekolah)
         // ══════════════════════════════════════════
 
-        $admin = User::create([
+        User::create([
             'name'     => 'Admin La-Taksal',
             'email'    => 'admin@gmail.com',
             'password' => Hash::make('password123'),
             'role'     => 'admin',
         ]);
 
-        $kepsek = User::create([
+        User::create([
             'name'     => 'Kepala Sekolah La-Taksal',
             'email'    => 'kepsek@gmail.com',
             'password' => Hash::make('password123'),
             'role'     => 'kepala_sekolah',
         ]);
-
-        // Wali murid — buat beberapa agar data lebih kaya
-        $waliData = [
-            ['name' => 'Bapak Budi Santoso',    'email' => 'walimurid@gmail.com'],
-            ['name' => 'Ibu Siti Rahayu',        'email' => 'siti@gmail.com'],
-            ['name' => 'Bapak Ahmad Fauzi',      'email' => 'ahmad@gmail.com'],
-            ['name' => 'Ibu Dewi Kurniawati',    'email' => 'dewi@gmail.com'],
-            ['name' => 'Bapak Hendra Wijaya',    'email' => 'hendra@gmail.com'],
-        ];
-
-        $walis = collect($waliData)->map(fn($w) => User::create([
-            'name'     => $w['name'],
-            'email'    => $w['email'],
-            'password' => Hash::make('password123'),
-            'role'     => 'wali_murid',
-        ]));
 
         // ══════════════════════════════════════════
         //  2. KATEGORI SPP
@@ -64,30 +48,76 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // ══════════════════════════════════════════
-        //  3. SISWA  (tiap wali punya 1–2 anak)
+        //  3. DATA SANTRI ASLI (dari Data_Santri.xlsx)
+        //     1 siswa = 1 wali murid
+        //     Nama wali : "Orangtua {nama siswa}"
+        //     Email wali: orangtua.{nama.siswa}@gmail.com
         // ══════════════════════════════════════════
 
-        $siswaData = [
-            // wali index 0 — Bapak Budi
-            ['id_user' => $walis[0]->id, 'nis' => '20240001', 'nama_siswa' => 'Muhammad Rizky Santoso',  'kelas' => 'VII-A'],
-            ['id_user' => $walis[0]->id, 'nis' => '20240002', 'nama_siswa' => 'Salsabila Budi Santoso',  'kelas' => 'VIII-B'],
-
-            // wali index 1 — Ibu Siti
-            ['id_user' => $walis[1]->id, 'nis' => '20240003', 'nama_siswa' => 'Fadhil Rahayu',           'kelas' => 'VII-A'],
-
-            // wali index 2 — Bapak Ahmad
-            ['id_user' => $walis[2]->id, 'nis' => '20240004', 'nama_siswa' => 'Nurul Hidayah Fauzi',    'kelas' => 'IX-A'],
-            ['id_user' => $walis[2]->id, 'nis' => '20240005', 'nama_siswa' => 'Habibie Ahmad Fauzi',    'kelas' => 'VII-B'],
-
-            // wali index 3 — Ibu Dewi
-            ['id_user' => $walis[3]->id, 'nis' => '20240006', 'nama_siswa' => 'Zahra Kurniawati',       'kelas' => 'VIII-A'],
-
-            // wali index 4 — Bapak Hendra
-            ['id_user' => $walis[4]->id, 'nis' => '20240007', 'nama_siswa' => 'Farhan Wijaya',          'kelas' => 'IX-B'],
-            ['id_user' => $walis[4]->id, 'nis' => '20240008', 'nama_siswa' => 'Alya Hendra Wijaya',     'kelas' => 'VIII-B'],
+        $dataSantri = [
+            ['kelas' => 'VII', 'nis' => '26.27.8.001', 'nama' => 'Aat Atmada Aan'],
+            ['kelas' => 'VII', 'nis' => '26.27.8.002', 'nama' => 'Achmad Aditya Nurwahid'],
+            ['kelas' => 'VII', 'nis' => '26.27.8.003', 'nama' => 'Dani Saputra'],
+            ['kelas' => 'VII', 'nis' => '26.27.8.004', 'nama' => 'Dhern Andrana Mirdad'],
+            ['kelas' => 'VII', 'nis' => '26.27.8.005', 'nama' => 'Fatir Qura Haqudin'],
+            ['kelas' => 'VII', 'nis' => '26.27.8.006', 'nama' => 'Muhamad Baihaqi Hafiz'],
+            ['kelas' => 'VII', 'nis' => '26.27.8.007', 'nama' => 'Muhammad Baqi Bilal Pratama'],
+            ['kelas' => 'VII', 'nis' => '26.27.8.008', 'nama' => 'Muhammad Raffi Wijaya'],
+            ['kelas' => 'VII', 'nis' => '26.27.8.009', 'nama' => 'Siti Yuningsih'],
+            ['kelas' => 'VII', 'nis' => '26.27.8.010', 'nama' => 'Zaki Ibnu Hafidz'],
+            ['kelas' => 'VII', 'nis' => '26.27.8.011', 'nama' => 'Zein Malik Ibrohim'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.001', 'nama' => 'Abdul Wahhab Asyamna'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.002', 'nama' => 'Anisa Awalia'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.003', 'nama' => 'Ardita Anggraeni'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.004', 'nama' => 'Ayu Amelia'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.005', 'nama' => 'Ega Dwi Cahya'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.006', 'nama' => 'Elki Ardian'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.007', 'nama' => 'Fitri Salwa Adelia'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.008', 'nama' => 'Manda Aulia'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.009', 'nama' => 'Mayda Aldinia Maharani'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.010', 'nama' => 'Muhamad Adwa'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.011', 'nama' => 'Muhamad Aldiansyah'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.012', 'nama' => 'Muhamad Reihan Nurizki'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.013', 'nama' => 'Putri Naila'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.014', 'nama' => 'Rifqi Zainul Muttaqin'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.015', 'nama' => 'Riskia Alifa Saputri'],
+            ['kelas' => 'VIII', 'nis' => '25.26.7.016', 'nama' => 'Zidni Nur Alia'],
+            ['kelas' => 'IX', 'nis' => '24.25.6.001', 'nama' => 'Firda Nur Azizzahra'],
+            ['kelas' => 'IX', 'nis' => '24.25.6.002', 'nama' => 'Haerul Adzam'],
+            ['kelas' => 'IX', 'nis' => '24.25.6.003', 'nama' => 'Indiani'],
+            ['kelas' => 'IX', 'nis' => '24.25.6.004', 'nama' => 'Ipariz Maulidani Akbar'],
+            ['kelas' => 'IX', 'nis' => '24.25.6.005', 'nama' => 'Jidan Abrori'],
+            ['kelas' => 'IX', 'nis' => '24.25.6.006', 'nama' => 'M. Ade Putra Rizalil Alam'],
+            ['kelas' => 'IX', 'nis' => '24.25.6.007', 'nama' => 'Muhamad Alpian'],
+            ['kelas' => 'IX', 'nis' => '24.25.6.008', 'nama' => 'Muhamad Apriyansah'],
+            ['kelas' => 'IX', 'nis' => '24.25.6.009', 'nama' => 'Muhamad Fathan Fadillah'],
+            ['kelas' => 'IX', 'nis' => '24.25.6.010', 'nama' => 'Muhamad Ibnu Solihin'],
+            ['kelas' => 'IX', 'nis' => '24.25.6.011', 'nama' => 'Muhammad Riswandi'],
+            ['kelas' => 'IX', 'nis' => '24.25.6.012', 'nama' => 'Najwa Kirania Saputra'],
+            ['kelas' => 'IX', 'nis' => '24.25.6.013', 'nama' => 'Rohimat'],
+            ['kelas' => 'IX', 'nis' => '24.25.6.014', 'nama' => 'Siti Mutmainatun Kamilah'],
+            ['kelas' => 'X', 'nis' => '23.24.5.002', 'nama' => 'Faisal Luthfi'],
+            ['kelas' => 'X', 'nis' => '23.24.5.003', 'nama' => 'Fuji Rahmawati'],
+            ['kelas' => 'X', 'nis' => '23.24.5.004', 'nama' => 'Mahmud Badarrudin'],
         ];
 
-        $siswas = collect($siswaData)->map(fn($s) => Siswa::create($s));
+        $siswas = collect();
+
+        foreach ($dataSantri as $s) {
+            $wali = User::create([
+                'name'     => 'Orangtua ' . $s['nama'],
+                'email'    => 'orangtua.' . Str::slug($s['nama'], '.') . '@gmail.com',
+                'password' => Hash::make('password123'),
+                'role'     => 'wali_murid',
+            ]);
+
+            $siswas->push(Siswa::create([
+                'id_user'    => $wali->id,
+                'nis'        => $s['nis'],
+                'nama_siswa' => $s['nama'],
+                'kelas'      => $s['kelas'],
+            ]));
+        }
 
         // ══════════════════════════════════════════
         //  4. TAGIHAN — Hanya 2 bulan untuk demo (September & Oktober)
@@ -98,9 +128,9 @@ class DatabaseSeeder extends Seeder
             'Oktober',   // index 1
         ];
 
+        // 8 siswa pertama lunas September, sisanya belum lunas
         $polaBayar = [
-            // [bulanIndex => bayar?]
-            0 => [0], // Lunas September (index 0), Oktober (index 1) belum lunas
+            0 => [0],
             1 => [0],
             2 => [0],
             3 => [0],
@@ -111,7 +141,6 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($siswas as $idx => $siswa) {
-            // Gunakan kategori 2026/2027 untuk semua tagihan
             $kategori = $kategori2026;
 
             foreach ($bulanList as $bulanIdx => $bulan) {
@@ -126,7 +155,6 @@ class DatabaseSeeder extends Seeder
                 ]);
 
                 if ($sudahBayar) {
-                    // Tanggal bayar: awal bulan tersebut
                     $tglBayar = now()
                         ->setYear(2026)
                         ->setMonth($bulanIdx + 1)
@@ -155,9 +183,8 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-
         // ══════════════════════════════════════════
-        //  6. SATU PEMBAYARAN PENDING (untuk test UI)
+        //  5. SATU PEMBAYARAN PENDING (untuk test UI)
         // ══════════════════════════════════════════
         /** @disregard P1005 */
         $tagihanPending = Tagihan::where('status_tagihan', 'Belum Lunas')->first();
