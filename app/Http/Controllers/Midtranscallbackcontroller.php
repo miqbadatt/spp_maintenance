@@ -94,7 +94,7 @@ class MidtransCallbackController extends Controller
     {
         return match ($paymentType) {
             'credit_card'       => 'Kartu Kredit',
-            'bank_transfer'     => 'Transfer Bank ' . strtoupper($payload['va_numbers'][0]['bank'] ?? ''),
+            'bank_transfer'     => 'Transfer Bank ' . strtoupper($payload['va_numbers'][0]['bank'] ?? $payload['bank'] ?? 'Lainnya'),
             'echannel'          => 'Mandiri Bill',
             'bca_klikpay'       => 'BCA KlikPay',
             'cimb_clicks'       => 'CIMB Clicks',
