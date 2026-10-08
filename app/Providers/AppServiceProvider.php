@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if (app()->environment('local')) {
-            Mail::alwaysTo('miqbad@raharja.info');
+            Mail::alwaysTo('laataksal7@gmail.com');
         }
 
         if (config('app.env') === 'production') {
