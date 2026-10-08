@@ -14,7 +14,7 @@
         {{-- Radial glows --}}
         <div
             style="position: absolute; inset: 0;
-        background: linear-gradient(to right, rgba(28, 21, 2, 0.9) 0%, rgba(3, 53, 40, 0.3) 70%, rgba(6,78,59,0) 100%);
+        background: linear-gradient(to right, rgba(20, 15, 1, 0.9) 0%, rgba(3, 53, 40, 0.3) 70%, rgba(6,78,59,0) 100%);
         pointer-events: none; z-index: 1;">
         </div>
         <div
