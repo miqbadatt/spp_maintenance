@@ -51,11 +51,18 @@ class Index extends Component
         $bulanIni = now()->locale('id')->isoFormat('MMMM');
         $tahunIni = now()->year;
 
+        $tagihanBulanIni = Tagihan::with(['kategori_spp'])
+            ->whereIn('id_siswa', $siswaIds)
+            ->where('bulan', $bulanIni)
+            ->where('tahun', $tahunIni)
+            ->get();
+
         return view('livewire.wali_murid.dashboard.index', compact(
             'stats',
             'tagihanBelumLunas',
             'riwayatTerbaru',
             'siswas',
+            'tagihanBulanIni',
             'bulanIni',
             'tahunIni',
         ));
