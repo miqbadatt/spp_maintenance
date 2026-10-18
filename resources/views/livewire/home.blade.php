@@ -111,7 +111,18 @@
                                 onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
                                 Buka Dashboard →
                             </a>
-                        @else
+                        @elseif (Auth::user()->role === 'kepala_sekolah')
+                            <a href="{{ route('kepala-sekolah.dashboard.index') }}" wire:navigate
+                                style="display: inline-flex; align-items: center; gap: 9px; padding: 14px 28px;
+                                       background: linear-gradient(135deg, var(--gd-400), var(--gd-500));
+                                       color: var(--em-950); font-weight: 700; font-size: 14px;
+                                       border-radius: var(--r-md); text-decoration: none;
+                                       box-shadow: 0 8px 32px rgba(245,158,11,0.35);
+                                       transition: transform 0.2s, box-shadow 0.2s;"
+                                onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+                                Buka Dashboard Keuangan →
+                            </a>
+                        @elseif (Auth::user()->role === 'wali_murid')
                             <a href="{{ route('wali-murid.dashboard.index') }}" wire:navigate
                                 style="display: inline-flex; align-items: center; gap: 9px; padding: 14px 28px;
                                        background: linear-gradient(135deg, var(--gd-400), var(--gd-500));

@@ -107,11 +107,18 @@
                     @endif
 
                     @if (Auth::user()->role === 'kepala_sekolah')
-                        {{-- placeholder --}}
-                        <li><a href="{{ route('kepala-sekolah.dashboard.index') }}" class="mobile-nav-item">📊
-                                Dashboard</a>
+                        <li>
+                            <a href="{{ route('kepala-sekolah.dashboard.index') }}"
+                                class="nav-link {{ request()->routeIs('kepala-sekolah.dashboard.*') ? 'nav-link--active' : '' }}">
+                                Dashboard
+                            </a>
                         </li>
-                        <li><a href="{{ route('kepala-sekolah.reports.index') }}" class="mobile-nav-item">Report</a></li>
+                        <li>
+                            <a href="{{ route('kepala-sekolah.reports.index') }}"
+                                class="nav-link {{ request()->routeIs('kepala-sekolah.reports.*') ? 'nav-link--active' : '' }}">
+                                Laporan
+                            </a>
+                        </li>
                     @endif
                 @endauth
             </ul>
@@ -259,6 +266,12 @@
                     </li>
                     <li><a href="{{ route('wali-murid.tagihan.index') }}" class="mobile-nav-item">📋 Tagihan</a></li>
                     <li><a href="{{ route('wali-murid.riwayat.index') }}" class="mobile-nav-item">🧾 Riwayat</a></li>
+                @endif
+
+                @if (Auth::user()->role === 'kepala_sekolah')
+                    <li><a href="{{ route('kepala-sekolah.dashboard.index') }}" class="mobile-nav-item">📊 Dashboard</a>
+                    </li>
+                    <li><a href="{{ route('kepala-sekolah.reports.index') }}" class="mobile-nav-item">📑 Laporan</a></li>
                 @endif
             @endauth
 

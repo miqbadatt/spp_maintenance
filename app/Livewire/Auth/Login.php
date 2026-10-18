@@ -19,12 +19,23 @@ class Login extends Component
             session()->regenerate();
             session()->flash('message', 'Login successful!');
             $role = Auth::user()->role;
+            $intended = session()->pull('url.intended');
+
             if ($role === 'admin') {
-                return redirect()->intended('/');
+                $target = ($intended && str_contains($intended, '/admin'))
+                    ? $intended
+                    : route('admin.dashboard.index');
+                return redirect()->to($target);
             } elseif ($role === 'wali_murid') {
-                return redirect()->intended('/');
+                $target = ($intended && str_contains($intended, '/wali-murid'))
+                    ? $intended
+                    : route('wali-murid.dashboard.index');
+                return redirect()->to($target);
             } elseif ($role === 'kepala_sekolah') {
-                return redirect()->intended('/');
+                $target = ($intended && str_contains($intended, '/kepala-sekolah'))
+                    ? $intended
+                    : route('kepala-sekolah.dashboard.index');
+                return redirect()->to($target);
             }
             Auth::logout();
             session()->invalidate();
