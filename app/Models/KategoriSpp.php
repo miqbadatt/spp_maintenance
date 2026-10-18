@@ -15,4 +15,9 @@ class KategoriSpp extends Model
     {
         return $this->hasMany(Tagihan::class, 'id_kategori', 'id_kategori');
     }
+
+    public function siswa()
+    {
+        return $this->hasMany(Siswa::class, 'id_kategori', 'id_kategori');
+    }
 }

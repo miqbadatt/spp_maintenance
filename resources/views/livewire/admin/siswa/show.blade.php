@@ -45,6 +45,23 @@
                         @endif
                     </div>
 
+                    <div style="margin-bottom:12px;">
+                        <div
+                            style="font-size:10px; letter-spacing:1.2px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">
+                            Kategori SPP (Tarif)
+                        </div>
+                        @if ($siswa->kategori_spp)
+                            <div style="font-size:13px; color:white; font-weight:600;">
+                                {{ $siswa->kategori_spp->tahun_ajaran }}
+                            </div>
+                            <div style="font-size:12px; color:var(--em-300); font-weight:700;">
+                                Rp {{ number_format($siswa->kategori_spp->nominal_spp, 0, ',', '.') }} / bulan
+                            </div>
+                        @else
+                            <span class="badge badge--telat">Belum diatur</span>
+                        @endif
+                    </div>
+
                     <div>
                         <div
                             style="font-size:10px; letter-spacing:1.2px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px;">

@@ -209,7 +209,7 @@
                                         ✓ Lunas
                                     </button>
 
-                                    {{-- Kirim Email --}}
+                                    {{-- Kirim Email (Disembunyikan untuk produksi, uncomment jika ingin digunakan kembali)
                                     <button wire:click="kirimPengingatEmail({{ $tagihan->id_tagihan }})"
                                         wire:loading.attr="disabled"
                                         class="btn"
@@ -217,6 +217,7 @@
                                         <span wire:loading.remove wire:target="kirimPengingatEmail({{ $tagihan->id_tagihan }})">📧 Email</span>
                                         <span wire:loading wire:target="kirimPengingatEmail({{ $tagihan->id_tagihan }})">⏳...</span>
                                     </button>
+                                    --}}
 
                                     {{-- Telat --}}
                                     @if(!$tagihan->is_terlambat)
@@ -344,7 +345,7 @@
                 {{-- Santri --}}
                 <div style="margin-bottom:16px;">
                     <label class="form-label">Santri</label>
-                    <select wire:model="create_id_siswa" class="form-select">
+                    <select wire:model.live="create_id_siswa" class="form-select">
                         <option value="">-- Pilih Santri --</option>
                         @foreach ($siswas as $s)
                             <option value="{{ $s->id_siswa }}">{{ $s->nama_siswa }} — {{ $s->nis }}</option>
@@ -449,19 +450,41 @@
 
                 {{-- Kategori --}}
                 <div style="margin-bottom:16px;">
-                    <label class="form-label">Tahun Ajaran / Kategori</label>
-                    <select wire:model="generate_id_kategori" class="form-select ">
-                        <option value="">-- Pilih Kategori --</option>
+                    <label class="form-label">Pilihan Kategori Tagihan</label>
+                    <select wire:model.live="generate_id_kategori" class="form-select">
+                        <option value="">⚡ Otomatis Sesuai Profil Santri (Khusus SPP Bulanan)</option>
                         @foreach ($kategoris as $k)
-                            <option value="{{ $k->id_kategori }}">{{ $k->tahun_ajaran }} — Rp
-                                {{ number_format($k->nominal_spp, 0, ',', '.') }}</option>
+                            <option value="{{ $k->id_kategori }}">
+                                {{ $k->tahun_ajaran }} — Rp {{ number_format($k->nominal_spp, 0, ',', '.') }}
+                            </option>
                         @endforeach
                     </select>
                     @error('generate_id_kategori')
-                        <span
-                            style="font-size:11px; color:#fca5a5; margin-top:4px; display:block;">{{ $message }}</span>
+                        <span style="font-size:11px; color:#fca5a5; margin-top:4px; display:block;">{{ $message }}</span>
                     @enderror
                 </div>
+
+                {{-- Target Santri Penerima --}}
+                @if (!empty($generate_id_kategori))
+                    <div style="margin-bottom:16px;">
+                        <label class="form-label">Target Santri Penerima Tagihan</label>
+                        <select wire:model="generate_target" class="form-select">
+                            <option value="all">👥 Semua Santri Aktif (Contoh: Class Meeting, Acara, Kegiatan, dll)</option>
+                            <option value="kategori">🎯 Hanya Santri yang Terdaftar di Kategori Ini</option>
+                        </select>
+                        <div style="font-size:11px; color:var(--em-300); margin-top:5px; line-height:1.4;">
+                            • <strong>Semua Santri:</strong> Cocok untuk iuran bersama (seperti Class Meeting / Uang Acara).<br>
+                            • <strong>Hanya Santri Kategori Ini:</strong> Hanya menagih santri yang profilnya terdaftar di kategori ini.
+                        </div>
+                        @error('generate_target')
+                            <span style="font-size:11px; color:#fca5a5; margin-top:4px; display:block;">{{ $message }}</span>
+                        @enderror
+                    </div>
+                @else
+                    <div style="margin-bottom:16px; font-size:11.5px; color:var(--em-300); line-height:1.5; background:rgba(255,255,255,0.06); padding:10px 14px; border-radius:8px;">
+                        💡 <strong>Mode SPP Bulanan:</strong> Seluruh santri akan otomatis ditagihkan SPP sesuai tarif kategori masing-masing di profilnya (Full / Dispen). Santri yang sudah memiliki tagihan SPP di periode ini otomatis dilewati.
+                    </div>
+                @endif
 
                 {{-- Bulan & Tahun --}}
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;">

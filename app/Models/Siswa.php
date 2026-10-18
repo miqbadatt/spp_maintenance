@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['id_siswa', 'id_user', 'nis', 'nama_siswa', 'kelas'])]
+#[Fillable(['id_siswa', 'id_user', 'id_kategori', 'nis', 'nama_siswa', 'kelas'])]
 class Siswa extends Model
 {
     protected $primaryKey = 'id_siswa';
@@ -13,6 +13,11 @@ class Siswa extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'id_user', 'id');
+    }
+
+    public function kategori_spp()
+    {
+        return $this->belongsTo(KategoriSpp::class, 'id_kategori', 'id_kategori');
     }
 
     public function tagihan()

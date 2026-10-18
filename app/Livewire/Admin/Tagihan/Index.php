@@ -30,6 +30,7 @@ class Index extends Component
     // ── Generate massal ─────────────────────────────
     public $showGenerateModal  = false;
     public $generate_id_kategori = '';
+    public $generate_target      = 'all';
     public $generate_bulan       = '';
     public $generate_tahun       = '';
 
@@ -77,6 +78,16 @@ class Index extends Component
         $this->showCreateModal = true;
     }
 
+    public function updatedCreateIdSiswa($value)
+    {
+        if ($value) {
+            $siswa = Siswa::find($value);
+            if ($siswa && $siswa->id_kategori) {
+                $this->create_id_kategori = $siswa->id_kategori;
+            }
+        }
+    }
+
     public function save()
     {
         $this->validate([
@@ -88,13 +99,12 @@ class Index extends Component
 
         /** @disregard P1005 */
         $exists = Tagihan::where('id_siswa', $this->create_id_siswa)
-            ->where('id_kategori', $this->create_id_kategori)
             ->where('bulan', $this->create_bulan)
             ->where('tahun', $this->create_tahun)
             ->exists();
 
         if ($exists) {
-            $this->addError('create_bulan', 'Tagihan untuk santri, bulan, dan tahun ini sudah ada.');
+            $this->addError('create_bulan', 'Santri ini sudah memiliki tagihan pada bulan dan tahun tersebut.');
             return;
         }
 
@@ -113,7 +123,8 @@ class Index extends Component
     // ── Generate massal ─────────────────────────────
     public function openGenerate()
     {
-        $this->reset(['generate_id_kategori', 'generate_bulan', 'generate_tahun']);
+        $this->reset(['generate_id_kategori', 'generate_target', 'generate_bulan', 'generate_tahun']);
+        $this->generate_target = 'all';
         $this->resetErrorBag();
         $this->showGenerateModal = true;
     }
@@ -121,39 +132,96 @@ class Index extends Component
     public function generate()
     {
         $this->validate([
-            'generate_id_kategori' => 'required|exists:kategori_spps,id_kategori',
+            'generate_id_kategori' => 'nullable|exists:kategori_spps,id_kategori',
+            'generate_target'      => 'required|in:all,kategori',
             'generate_bulan'       => 'required|string|max:20',
             'generate_tahun'       => 'required|integer|min:2000|max:2100',
         ]);
 
-        $siswas = Siswa::all();
         $created = 0;
         $skipped = 0;
 
-        foreach ($siswas as $siswa) {
-            /** @disregard P1005 */
-            $exists = Tagihan::where('id_siswa', $siswa->id_siswa)
-                ->where('id_kategori', $this->generate_id_kategori)
-                ->where('bulan', $this->generate_bulan)
-                ->where('tahun', $this->generate_tahun)
-                ->exists();
+        if (empty($this->generate_id_kategori)) {
+            // ── MODE A: TAGIHAN SPP BULANAN OTOMATIS SESUAI PROFIL SANTRI ──
+            $siswas = Siswa::all();
+            $defaultKategoriId = KategoriSpp::first()?->id_kategori;
+            $namaKategori = 'SPP Bulanan';
 
-            if (!$exists) {
-                Tagihan::create([
-                    'id_siswa'       => $siswa->id_siswa,
-                    'id_kategori'    => $this->generate_id_kategori,
-                    'bulan'          => $this->generate_bulan,
-                    'tahun'          => $this->generate_tahun,
-                    'status_tagihan' => 'Belum Lunas',
-                ]);
-                $created++;
+            foreach ($siswas as $siswa) {
+                $kategoriId = $siswa->id_kategori ?: $defaultKategoriId;
+
+                if (!$kategoriId) {
+                    continue;
+                }
+
+                // Cek apakah santri ini sudah memiliki tagihan untuk kategori SPP miliknya di bulan & tahun ini
+                /** @disregard P1005 */
+                $exists = Tagihan::where('id_siswa', $siswa->id_siswa)
+                    ->where('id_kategori', $kategoriId)
+                    ->where('bulan', $this->generate_bulan)
+                    ->where('tahun', $this->generate_tahun)
+                    ->exists();
+
+                if (!$exists) {
+                    Tagihan::create([
+                        'id_siswa'       => $siswa->id_siswa,
+                        'id_kategori'    => $kategoriId,
+                        'bulan'          => $this->generate_bulan,
+                        'tahun'          => $this->generate_tahun,
+                        'status_tagihan' => 'Belum Lunas',
+                    ]);
+                    $created++;
+                } else {
+                    $skipped++;
+                }
+            }
+
+        } else {
+            // ── MODE B: KATEGORI TERTENTU (Class Meeting, Uang Acara, atau Kategori Tertentu) ──
+            $kategoriDipilih = KategoriSpp::find($this->generate_id_kategori);
+            $namaKategori = $kategoriDipilih ? $kategoriDipilih->tahun_ajaran : 'kategori terpilih';
+
+            if ($this->generate_target === 'kategori') {
+                // Hanya santri yang profilnya terdaftar di kategori ini
+                $siswas = Siswa::where('id_kategori', $this->generate_id_kategori)->get();
             } else {
-                $skipped++;
+                // Semua santri aktif (untuk Class Meeting, Uang Acara, dll)
+                $siswas = Siswa::all();
+            }
+
+            foreach ($siswas as $siswa) {
+                // Cek apakah santri sudah memiliki tagihan untuk KATEGORI INI di bulan & tahun yang sama
+                /** @disregard P1005 */
+                $exists = Tagihan::where('id_siswa', $siswa->id_siswa)
+                    ->where('id_kategori', $this->generate_id_kategori)
+                    ->where('bulan', $this->generate_bulan)
+                    ->where('tahun', $this->generate_tahun)
+                    ->exists();
+
+                if (!$exists) {
+                    Tagihan::create([
+                        'id_siswa'       => $siswa->id_siswa,
+                        'id_kategori'    => $this->generate_id_kategori,
+                        'bulan'          => $this->generate_bulan,
+                        'tahun'          => $this->generate_tahun,
+                        'status_tagihan' => 'Belum Lunas',
+                    ]);
+                    $created++;
+                } else {
+                    $skipped++;
+                }
             }
         }
 
         $this->showGenerateModal = false;
-        session()->flash('message', "Generate selesai: {$created} tagihan dibuat, {$skipped} dilewati (sudah ada).");
+
+        $msg = "Generate '{$namaKategori}' selesai: {$created} tagihan dibuat, {$skipped} dilewati";
+        if ($skipped > 0) {
+            $msg .= " (santri sudah memiliki tagihan ini pada periode {$this->generate_bulan} {$this->generate_tahun})";
+        }
+        $msg .= ".";
+
+        session()->flash('message', $msg);
     }
 
     // ── Edit ────────────────────────────────────────

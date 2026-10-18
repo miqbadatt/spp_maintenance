@@ -20,8 +20,8 @@ class Index extends Component
 
     public function render()
     {
-        // Mengambil data siswa beserta relasi user (wali murid)
-        $siswas = Siswa::with('user')->latest()->paginate(10);
+        // Mengambil data siswa beserta relasi user (wali murid) dan kategori spp
+        $siswas = Siswa::with(['user', 'kategori_spp'])->latest()->paginate(10);
 
         return view('livewire.admin.siswa.index', [
             'siswas' => $siswas

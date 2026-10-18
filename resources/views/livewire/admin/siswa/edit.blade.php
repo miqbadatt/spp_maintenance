@@ -65,10 +65,27 @@
                 </div>
 
                 {{-- KELAS --}}
-                <div style="margin-bottom:28px;">
+                <div style="margin-bottom:18px;">
                     <label class="form-label">Kelas</label>
                     <input type="text" wire:model="kelas" class="form-input" placeholder="Contoh: VII-A, VIII-B">
                     @error('kelas')
+                        <span
+                            style="font-size:11px; color:#fca5a5; margin-top:4px; display:block;">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- KATEGORI SPP / GOLONGAN TARIF --}}
+                <div style="margin-bottom:28px;">
+                    <label class="form-label">Kategori SPP (Tarif / Golongan)</label>
+                    <select wire:model="id_kategori" class="form-select">
+                        <option value="">-- Pilih Kategori SPP --</option>
+                        @foreach ($kategoris as $k)
+                            <option value="{{ $k->id_kategori }}">
+                                {{ $k->tahun_ajaran }} — Rp {{ number_format($k->nominal_spp, 0, ',', '.') }}/bulan
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('id_kategori')
                         <span
                             style="font-size:11px; color:#fca5a5; margin-top:4px; display:block;">{{ $message }}</span>
                     @enderror

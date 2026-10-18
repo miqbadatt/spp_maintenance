@@ -54,6 +54,7 @@
                         <th>Santri</th>
                         <th>NIS</th>
                         <th>Kelas</th>
+                        <th>Kategori SPP</th>
                         <th>Wali Murid</th>
                         <th style="text-align: right; padding-right: 24px;">Aksi</th>
                     </tr>
@@ -74,6 +75,20 @@
                         </td>
                         <td><span class="amount">{{ $siswa->nis }}</span></td>
                         <td><span class="chip chip--default">{{ $siswa->kelas }}</span></td>
+                        <td>
+                            @if ($siswa->kategori_spp)
+                                <div>
+                                    <span class="chip chip--default" style="font-size:11px; font-weight:600;">
+                                        {{ $siswa->kategori_spp->tahun_ajaran }}
+                                    </span>
+                                    <div class="text-emerald" style="font-weight:700; font-size:11.5px; margin-top:2px;">
+                                        Rp {{ number_format($siswa->kategori_spp->nominal_spp, 0, ',', '.') }}/bln
+                                    </div>
+                                </div>
+                            @else
+                                <span class="badge badge--telat" style="font-size:10.5px;">Belum diatur</span>
+                            @endif
+                        </td>
                         <td>
                             @if ($siswa->user)
                                 <div class="santri-info">
@@ -135,7 +150,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" style="text-align:center; padding:48px 20px;">
+                        <td colspan="6" style="text-align:center; padding:48px 20px;">
                             <div style="font-size:32px; margin-bottom:12px;">🎒</div>
                             <div
                                 style="font-family:var(--font-display); font-weight:700; font-size:16px; color:var(--ink-muted);">

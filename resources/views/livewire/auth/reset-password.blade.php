@@ -204,14 +204,20 @@
      STYLES
 ══════════════════════════════════════════ --}}
 <style>
+    html, body {
+        background-color: var(--em-950) !important;
+        overflow-x: hidden;
+    }
+
     /* ── Page Shell ───────────────────────────────────── */
     .login-page {
-        position: fixed;
-        inset: 0;
+        position: relative;
+        min-height: calc(100vh - 66px);
         display: flex;
         align-items: center;
         justify-content: center;
         background: var(--em-950);
+        padding: 40px 16px;
         overflow: hidden;
         font-family: var(--font-body);
     }

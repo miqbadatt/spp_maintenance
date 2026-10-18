@@ -66,6 +66,20 @@
                 <div class="heading-line"></div>
             </div>
 
+            {{-- ── SUCCESS MESSAGE ── --}}
+            @if (session()->has('message') || session()->has('success'))
+                <div class="success-box" x-data="{ show: true }" x-show="show" x-transition>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                    <span>{{ session('message') ?? session('success') }}</span>
+                    <button @click="show=false"
+                        style="margin-left:auto;background:none;border:none;cursor:pointer;color:inherit;font-size:16px;line-height:1;">×</button>
+                </div>
+            @endif
+
             {{-- ── ERROR ── --}}
             @if (session()->has('error'))
                 <div class="error-box" x-data="{ show: true }" x-show="show" x-transition>
@@ -566,6 +580,21 @@
             opacity: 1;
             transform: translateY(0);
         }
+    }
+
+    /* ── Success box ──────────────────────────────────── */
+    .success-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.35);
+        border-radius: var(--r-md);
+        padding: 12px 14px;
+        font-size: 13px;
+        color: #6ee7b7;
+        margin-bottom: 20px;
+        line-height: 1.5;
     }
 
     /* ── Error box ────────────────────────────────────── */
