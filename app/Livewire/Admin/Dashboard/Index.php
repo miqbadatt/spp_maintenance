@@ -7,6 +7,7 @@ use App\Models\Pembayaran;
 use App\Models\Siswa;
 use App\Models\Tagihan;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Index extends Component
@@ -28,10 +29,9 @@ class Index extends Component
         $terkumpul = Pembayaran::whereIn('status_pembayaran', ['settlement', 'capture', 'Lunas'])
             ->sum('jumlah_bayar');
 
-        // Potensi total (semua tagihan × nominal kategori)
-        $potensi = Tagihan::with('kategori_spp')
-            ->get()
-            ->sum(fn($t) => $t->kategori_spp->nominal_spp ?? 0);
+        // Potensi total (semua tagihan × nominal kategori) dihitung langsung via SQL join
+        $potensi = Tagihan::join('kategori_spps', 'tagihans.id_kategori', '=', 'kategori_spps.id_kategori')
+            ->sum('kategori_spps.nominal_spp');
 
         // Tagihan belum lunas terbaru (5 data)
         $tagihanMenunggu = Tagihan::with(['siswa', 'kategori_spp'])
@@ -46,7 +46,7 @@ class Index extends Component
             ->take(5)
             ->get();
 
-        // Rekapitulasi per bulan (12 bulan terakhir dari tagihan lunas)
+        // Rekapitulasi per bulan (12 bulan terakhir) - 1 query SQL teragregasi
         $bulanList = [
             'Januari',
             'Februari',
@@ -61,16 +61,20 @@ class Index extends Component
             'November',
             'Desember'
         ];
-        $rekapBulan = collect($bulanList)->map(function ($bulan) {
-            /** @disregard P1005 */
+
+        $tagihanPerBulan = Tagihan::where('tahun', now()->year)
+            ->select('bulan', 'status_tagihan', DB::raw('count(*) as total'))
+            ->groupBy('bulan', 'status_tagihan')
+            ->get();
+
+        $rekapBulan = collect($bulanList)->map(function ($bulan) use ($tagihanPerBulan) {
+            $lunas = $tagihanPerBulan->first(fn($item) => $item->bulan === $bulan && $item->status_tagihan === 'Lunas')?->total ?? 0;
+            $belum = $tagihanPerBulan->first(fn($item) => $item->bulan === $bulan && $item->status_tagihan === 'Belum Lunas')?->total ?? 0;
+
             return [
                 'bulan'  => $bulan,
-                'lunas'  => Tagihan::where('bulan', $bulan)
-                    ->where('tahun', now()->year)
-                    ->where('status_tagihan', 'Lunas')->count(),
-                'belum'  => Tagihan::where('bulan', $bulan)
-                    ->where('tahun', now()->year)
-                    ->where('status_tagihan', 'Belum Lunas')->count(),
+                'lunas'  => $lunas,
+                'belum'  => $belum,
             ];
         });
 

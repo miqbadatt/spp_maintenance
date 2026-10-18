@@ -50,33 +50,58 @@ class Index extends Component
             ->join('kategori_spps', 'tagihans.id_kategori', '=', 'kategori_spps.id_kategori')
             ->sum('kategori_spps.nominal_spp');
 
-        // ── Pemasukan 6 bulan terakhir (grafik) ───────────────
-        $chartData = collect();
+        // ── Pemasukan 6 bulan terakhir (grafik - 1 query agregasi) ──
+        $listPeriode = collect();
         for ($i = 5; $i >= 0; $i--) {
-            $tgl    = $now->copy()->subMonths($i);
-            $bulan  = $tgl->locale('id')->isoFormat('MMMM');
-            $tahun  = $tgl->year;
-            /** @disregard P1005 */
-            $nominal = Pembayaran::where('status_pembayaran', 'settlement')
-                ->whereHas('tagihan', fn($q) => $q->where('bulan', $bulan)->where('tahun', $tahun))
-                ->sum('jumlah_bayar');
-            $chartData->push([
-                'label'   => $tgl->isoFormat('MMM'),
-                'nominal' => $nominal,
+            $tgl = $now->copy()->subMonths($i);
+            $listPeriode->push([
+                'label' => $tgl->isoFormat('MMM'),
+                'bulan' => $tgl->locale('id')->isoFormat('MMMM'),
+                'tahun' => $tgl->year,
             ]);
         }
 
-        // ── Persentase lunas per kelas ─────────────────────────
+        $pembayaran6Bulan = Pembayaran::where('status_pembayaran', 'settlement')
+            ->join('tagihans', 'pembayarans.id_tagihan', '=', 'tagihans.id_tagihan')
+            ->where(function ($query) use ($listPeriode) {
+                foreach ($listPeriode as $p) {
+                    $query->orWhere(function ($q) use ($p) {
+                        $q->where('tagihans.bulan', $p['bulan'])->where('tagihans.tahun', $p['tahun']);
+                    });
+                }
+            })
+            ->select('tagihans.bulan', 'tagihans.tahun', DB::raw('sum(pembayarans.jumlah_bayar) as total'))
+            ->groupBy('tagihans.bulan', 'tagihans.tahun')
+            ->get();
+
+        $chartData = $listPeriode->map(function ($p) use ($pembayaran6Bulan) {
+            $match = $pembayaran6Bulan->first(fn($item) => $item->bulan === $p['bulan'] && (int)$item->tahun === (int)$p['tahun']);
+            return [
+                'label'   => $p['label'],
+                'nominal' => (int) ($match?->total ?? 0),
+            ];
+        });
+
+        // ── Persentase lunas per kelas (1 query agregasi) ─────
+        $rekapPerKelas = Tagihan::join('siswas', 'tagihans.id_siswa', '=', 'siswas.id_siswa')
+            ->select(
+                'siswas.kelas',
+                DB::raw("COUNT(*) as total_tagihan"),
+                DB::raw("SUM(CASE WHEN tagihans.status_tagihan = 'Lunas' THEN 1 ELSE 0 END) as total_lunas")
+            )
+            ->groupBy('siswas.kelas')
+            ->get()
+            ->keyBy('kelas');
+
         $perKelas = Siswa::select('kelas', DB::raw('count(*) as total'))
             ->groupBy('kelas')
             ->orderBy('kelas')
             ->get()
-            ->map(function ($row) {
-                /** @disregard P1005 */
-                $lunas = Tagihan::where('status_tagihan', 'Lunas')
-                    ->whereHas('siswa', fn($q) => $q->where('kelas', $row->kelas))
-                    ->count();
-                $total = Tagihan::whereHas('siswa', fn($q) => $q->where('kelas', $row->kelas))->count();
+            ->map(function ($row) use ($rekapPerKelas) {
+                $stat = $rekapPerKelas->get($row->kelas);
+                $lunas = (int) ($stat?->total_lunas ?? 0);
+                $total = (int) ($stat?->total_tagihan ?? 0);
+
                 return [
                     'kelas'   => $row->kelas,
                     'siswa'   => $row->total,

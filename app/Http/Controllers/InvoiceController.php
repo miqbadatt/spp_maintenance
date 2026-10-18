@@ -20,6 +20,12 @@ class InvoiceController extends Controller
             abort(403, 'Invoice hanya tersedia untuk pembayaran yang sudah lunas.');
         }
 
+        // Pastikan wali murid hanya dapat mengakses invoice santri miliknya sendiri
+        $user = Auth::user();
+        if ($user && $user->role === 'wali_murid' && $pembayaran->tagihan?->siswa?->id_user !== $user->id) {
+            abort(403, 'Anda tidak memiliki izin untuk melihat invoice ini.');
+        }
+
         return view('wali-murid.invoice', compact('pembayaran'));
     }
 }

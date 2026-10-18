@@ -42,8 +42,10 @@ class Index extends Component
             ->when($this->filterStatus, fn($q) => $q->where('status_pembayaran', $this->filterStatus))
             ->when($this->filterBulan,  fn($q) => $q->whereHas('tagihan', fn($q2) => $q2->where('bulan', $this->filterBulan)))
             ->when($this->filterTahun,  fn($q) => $q->whereHas('tagihan', fn($q2) => $q2->where('tahun', $this->filterTahun)))
-            ->when($this->search,       fn($q) => $q->where('order_id', 'like', '%' . $this->search . '%')
-                ->orWhereHas('tagihan.siswa', fn($q2) => $q2->where('nama_siswa', 'like', '%' . $this->search . '%')))
+            ->when($this->search, fn($q) => $q->where(function ($sub) {
+                $sub->where('order_id', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('tagihan.siswa', fn($q2) => $q2->where('nama_siswa', 'like', '%' . $this->search . '%'));
+            }))
             ->latest()
             ->paginate(10);
 

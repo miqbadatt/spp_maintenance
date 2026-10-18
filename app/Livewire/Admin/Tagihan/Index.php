@@ -140,12 +140,27 @@ class Index extends Component
 
         $created = 0;
         $skipped = 0;
+        $now = now();
 
         if (empty($this->generate_id_kategori)) {
             // ── MODE A: TAGIHAN SPP BULANAN OTOMATIS SESUAI PROFIL SANTRI ──
-            $siswas = Siswa::all();
+            $siswas = Siswa::select('id_siswa', 'id_kategori')->get();
             $defaultKategoriId = KategoriSpp::first()?->id_kategori;
             $namaKategori = 'SPP Bulanan';
+
+            if (!$defaultKategoriId && $siswas->isEmpty()) {
+                session()->flash('message', 'Tidak ada data santri atau kategori SPP ditemukan.');
+                return;
+            }
+
+            // Ambil seluruh tagihan yang sudah ada untuk periode ini dalam 1 query (tanpa N+1)
+            $existingTagihan = Tagihan::whereIn('id_siswa', $siswas->pluck('id_siswa'))
+                ->where('bulan', $this->generate_bulan)
+                ->where('tahun', $this->generate_tahun)
+                ->get()
+                ->mapWithKeys(fn($item) => [$item->id_siswa . '_' . $item->id_kategori => true]);
+
+            $recordsToInsert = [];
 
             foreach ($siswas as $siswa) {
                 $kategoriId = $siswa->id_kategori ?: $defaultKategoriId;
@@ -154,61 +169,72 @@ class Index extends Component
                     continue;
                 }
 
-                // Cek apakah santri ini sudah memiliki tagihan untuk kategori SPP miliknya di bulan & tahun ini
-                /** @disregard P1005 */
-                $exists = Tagihan::where('id_siswa', $siswa->id_siswa)
-                    ->where('id_kategori', $kategoriId)
-                    ->where('bulan', $this->generate_bulan)
-                    ->where('tahun', $this->generate_tahun)
-                    ->exists();
+                $key = $siswa->id_siswa . '_' . $kategoriId;
 
-                if (!$exists) {
-                    Tagihan::create([
+                if (isset($existingTagihan[$key])) {
+                    $skipped++;
+                } else {
+                    $recordsToInsert[] = [
                         'id_siswa'       => $siswa->id_siswa,
                         'id_kategori'    => $kategoriId,
                         'bulan'          => $this->generate_bulan,
                         'tahun'          => $this->generate_tahun,
                         'status_tagihan' => 'Belum Lunas',
-                    ]);
+                        'created_at'     => $now,
+                        'updated_at'     => $now,
+                    ];
                     $created++;
-                } else {
-                    $skipped++;
+                }
+            }
+
+            // Eksekusi bulk insert dalam chunk 250 record untuk kecepatan maksimal
+            if (!empty($recordsToInsert)) {
+                foreach (array_chunk($recordsToInsert, 250) as $chunk) {
+                    Tagihan::insert($chunk);
                 }
             }
 
         } else {
-            // ── MODE B: KATEGORI TERTENTU (Class Meeting, Uang Acara, atau Kategori Tertentu) ──
+            // ── MODE B: KATEGORI TERTENTU (Class Meeting, Uang Acara, dll) ──
             $kategoriDipilih = KategoriSpp::find($this->generate_id_kategori);
             $namaKategori = $kategoriDipilih ? $kategoriDipilih->tahun_ajaran : 'kategori terpilih';
 
+            $siswaQuery = Siswa::select('id_siswa');
             if ($this->generate_target === 'kategori') {
-                // Hanya santri yang profilnya terdaftar di kategori ini
-                $siswas = Siswa::where('id_kategori', $this->generate_id_kategori)->get();
-            } else {
-                // Semua santri aktif (untuk Class Meeting, Uang Acara, dll)
-                $siswas = Siswa::all();
+                $siswaQuery->where('id_kategori', $this->generate_id_kategori);
             }
+            $siswas = $siswaQuery->get();
+
+            // Ambil ID santri yang sudah memiliki tagihan kategori ini dalam 1 query
+            $existingStudentIds = Tagihan::whereIn('id_siswa', $siswas->pluck('id_siswa'))
+                ->where('id_kategori', $this->generate_id_kategori)
+                ->where('bulan', $this->generate_bulan)
+                ->where('tahun', $this->generate_tahun)
+                ->pluck('id_siswa')
+                ->flip();
+
+            $recordsToInsert = [];
 
             foreach ($siswas as $siswa) {
-                // Cek apakah santri sudah memiliki tagihan untuk KATEGORI INI di bulan & tahun yang sama
-                /** @disregard P1005 */
-                $exists = Tagihan::where('id_siswa', $siswa->id_siswa)
-                    ->where('id_kategori', $this->generate_id_kategori)
-                    ->where('bulan', $this->generate_bulan)
-                    ->where('tahun', $this->generate_tahun)
-                    ->exists();
-
-                if (!$exists) {
-                    Tagihan::create([
+                if (isset($existingStudentIds[$siswa->id_siswa])) {
+                    $skipped++;
+                } else {
+                    $recordsToInsert[] = [
                         'id_siswa'       => $siswa->id_siswa,
                         'id_kategori'    => $this->generate_id_kategori,
                         'bulan'          => $this->generate_bulan,
                         'tahun'          => $this->generate_tahun,
                         'status_tagihan' => 'Belum Lunas',
-                    ]);
+                        'created_at'     => $now,
+                        'updated_at'     => $now,
+                    ];
                     $created++;
-                } else {
-                    $skipped++;
+                }
+            }
+
+            if (!empty($recordsToInsert)) {
+                foreach (array_chunk($recordsToInsert, 250) as $chunk) {
+                    Tagihan::insert($chunk);
                 }
             }
         }
@@ -332,7 +358,7 @@ class Index extends Component
         return view('livewire.admin.tagihan.index', [
             'tagihans'  => $query->paginate(10),
             'kategoris' => KategoriSpp::all(),
-            'siswas'    => Siswa::all(),
+            'siswas'    => Siswa::select('id_siswa', 'nama_siswa', 'nis')->orderBy('nama_siswa')->get(),
             'bulanList' => [
                 'Januari',
                 'Februari',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class MidtransCallbackController extends Controller
@@ -62,27 +63,29 @@ class MidtransCallbackController extends Controller
             default                                                       => $pembayaran->status_pembayaran,
         };
 
-        // ── 4. Update pembayaran ───────────────────────────────
-        $pembayaran->update([
-            'status_pembayaran'       => $statusBaru,
-            'midtrans_transaction_id' => $payload['transaction_id'] ?? $pembayaran->midtrans_transaction_id,
-            'metode_bayar'            => $this->resolveMetode($paymentType, $payload),
-            'waktu_pembayaran'        => $statusBaru === 'settlement'
-                ? now()->parse($payload['settlement_time'] ?? now())
-                : $pembayaran->waktu_pembayaran,
-            'callback_payload'        => $payload,
-        ]);
-
-        if ($statusBaru === 'settlement') {
-            /** @disregard P1005 */
-            Tagihan::where('id_tagihan', $pembayaran->id_tagihan)
-                ->update(['status_tagihan' => 'Lunas']);
-
-            Log::info('Tagihan dilunasi via Midtrans', [
-                'order_id'    => $orderId,
-                'id_tagihan'  => $pembayaran->id_tagihan,
+        // ── 4. Update pembayaran & tagihan dalam transaksi atomik ──
+        DB::transaction(function () use ($pembayaran, $statusBaru, $payload, $paymentType, $orderId) {
+            $pembayaran->update([
+                'status_pembayaran'       => $statusBaru,
+                'midtrans_transaction_id' => $payload['transaction_id'] ?? $pembayaran->midtrans_transaction_id,
+                'metode_bayar'            => $this->resolveMetode($paymentType, $payload),
+                'waktu_pembayaran'        => $statusBaru === 'settlement'
+                    ? now()->parse($payload['settlement_time'] ?? now())
+                    : $pembayaran->waktu_pembayaran,
+                'callback_payload'        => $payload,
             ]);
-        }
+
+            if ($statusBaru === 'settlement') {
+                /** @disregard P1005 */
+                Tagihan::where('id_tagihan', $pembayaran->id_tagihan)
+                    ->update(['status_tagihan' => 'Lunas']);
+
+                Log::info('Tagihan dilunasi via Midtrans', [
+                    'order_id'    => $orderId,
+                    'id_tagihan'  => $pembayaran->id_tagihan,
+                ]);
+            }
+        });
 
         return response()->json(['message' => 'OK']);
     }

@@ -74,28 +74,42 @@ class Index extends Component
             ->join('kategori_spps', 'tagihans.id_kategori', '=', 'kategori_spps.id_kategori')
             ->sum('kategori_spps.nominal_spp');
 
-        // ── Rekap per kelas ────────────────────────────────────
+        // ── Rekap per kelas (Teragregasi dalam 2 query cepat, tanpa N+1) ──
+        $statsTagihanPerKelas = Tagihan::join('siswas', 'tagihans.id_siswa', '=', 'siswas.id_siswa')
+            ->when($this->filterBulan,    fn($q) => $q->where('tagihans.bulan', $this->filterBulan))
+            ->when($this->filterTahun,    fn($q) => $q->where('tagihans.tahun', $this->filterTahun))
+            ->when($this->filterKategori, fn($q) => $q->where('tagihans.id_kategori', $this->filterKategori))
+            ->select(
+                'siswas.kelas',
+                DB::raw("COUNT(*) as total_tagihan"),
+                DB::raw("SUM(CASE WHEN tagihans.status_tagihan = 'Lunas' THEN 1 ELSE 0 END) as total_lunas")
+            )
+            ->groupBy('siswas.kelas')
+            ->get()
+            ->keyBy('kelas');
+
+        $statsBayarPerKelas = Pembayaran::where('status_pembayaran', 'settlement')
+            ->join('tagihans', 'pembayarans.id_tagihan', '=', 'tagihans.id_tagihan')
+            ->join('siswas', 'tagihans.id_siswa', '=', 'siswas.id_siswa')
+            ->when($this->filterBulan,    fn($q) => $q->where('tagihans.bulan', $this->filterBulan))
+            ->when($this->filterTahun,    fn($q) => $q->where('tagihans.tahun', $this->filterTahun))
+            ->when($this->filterKategori, fn($q) => $q->where('tagihans.id_kategori', $this->filterKategori))
+            ->select('siswas.kelas', DB::raw('SUM(pembayarans.jumlah_bayar) as total_nominal'))
+            ->groupBy('siswas.kelas')
+            ->get()
+            ->keyBy('kelas');
+
         $rekapKelas = Siswa::select('kelas', DB::raw('count(*) as jumlah_siswa'))
             ->groupBy('kelas')
             ->orderBy('kelas')
             ->get()
-            ->map(function ($row) {
-                $base = Tagihan::whereHas('siswa', fn($q) => $q->where('kelas', $row->kelas))
-                    ->when($this->filterBulan,    fn($q) => $q->where('bulan', $this->filterBulan))
-                    ->when($this->filterTahun,    fn($q) => $q->where('tahun', $this->filterTahun))
-                    ->when($this->filterKategori, fn($q) => $q->where('id_kategori', $this->filterKategori));
+            ->map(function ($row) use ($statsTagihanPerKelas, $statsBayarPerKelas) {
+                $statT = $statsTagihanPerKelas->get($row->kelas);
+                $statB = $statsBayarPerKelas->get($row->kelas);
 
-                $lunas = (clone $base)->where('status_tagihan', 'Lunas')->count();
-                $total = (clone $base)->count();
-                /** @disregard P1005 */
-                $nominal = Pembayaran::where('status_pembayaran', 'settlement')
-                    ->whereHas('tagihan', function ($q) use ($row) {
-                        $q->whereHas('siswa', fn($q2) => $q2->where('kelas', $row->kelas))
-                            ->when($this->filterBulan,    fn($q2) => $q2->where('bulan', $this->filterBulan))
-                            ->when($this->filterTahun,    fn($q2) => $q2->where('tahun', $this->filterTahun))
-                            ->when($this->filterKategori, fn($q2) => $q2->where('id_kategori', $this->filterKategori));
-                    })
-                    ->sum('jumlah_bayar');
+                $lunas   = (int) ($statT?->total_lunas ?? 0);
+                $total   = (int) ($statT?->total_tagihan ?? 0);
+                $nominal = (int) ($statB?->total_nominal ?? 0);
 
                 return [
                     'kelas'       => $row->kelas,
