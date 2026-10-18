@@ -47,16 +47,17 @@
 
     {{-- TABLE --}}
     <div class="table-card">
-        <table>
-            <thead>
-                <tr>
-                    <th>Santri</th>
-                    <th>NIS</th>
-                    <th>Kelas</th>
-                    <th>Wali Murid</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
+        <div class="table-responsive">
+            <table style="min-width: 720px;">
+                <thead>
+                    <tr>
+                        <th>Santri</th>
+                        <th>NIS</th>
+                        <th>Kelas</th>
+                        <th>Wali Murid</th>
+                        <th style="text-align: right; padding-right: 24px;">Aksi</th>
+                    </tr>
+                </thead>
             <tbody>
                 @forelse ($siswas as $siswa)
                     <tr x-data="{ confirmDelete: false }">
@@ -90,7 +91,7 @@
                             @endif
                         </td>
                         <td>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center justify-end gap-2" style="white-space: nowrap;">
                                 <a href="/admin/siswa/{{ $siswa->id_siswa }}" wire:navigate class="btn btn--ghost"
                                     style="padding:6px 14px; font-size:12px;">
                                     Detail
@@ -147,6 +148,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
 
         {{-- PAGINATION --}}
         @if ($siswas->hasPages())

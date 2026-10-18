@@ -45,15 +45,16 @@
 
     {{-- TABLE --}}
     <div class="table-card">
-        <table>
-            <thead>
-                <tr>
-                    <th>Tahun Ajaran</th>
-                    <th>Nominal SPP</th>
-                    <th>Dibuat</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
+        <div class="table-responsive">
+            <table style="min-width: 580px;">
+                <thead>
+                    <tr>
+                        <th>Tahun Ajaran</th>
+                        <th>Nominal SPP</th>
+                        <th>Dibuat</th>
+                        <th style="text-align: right; padding-right: 24px;">Aksi</th>
+                    </tr>
+                </thead>
             <tbody>
                 @forelse ($kategoris as $kategori)
                     <tr x-data="{ confirmDelete: false }">
@@ -79,7 +80,7 @@
                             </span>
                         </td>
                         <td>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center justify-end gap-2" style="white-space: nowrap;">
                                 <a href="/admin/kategori/{{ $kategori->id_kategori }}" wire:navigate
                                     class="btn btn--ghost" style="padding:6px 14px; font-size:12px;">
                                     Detail
@@ -135,6 +136,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
 
         @if ($kategoris->hasPages())
             <div

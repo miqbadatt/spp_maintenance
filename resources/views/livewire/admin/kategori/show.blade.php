@@ -95,7 +95,8 @@
                         </p>
                     </div>
                 @else
-                    <table>
+                    <div class="table-responsive">
+                    <table style="min-width: 500px;">
                         <thead>
                             <tr>
                                 <th>Santri</th>
@@ -132,6 +133,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                 @endif
             </div>
         </div>

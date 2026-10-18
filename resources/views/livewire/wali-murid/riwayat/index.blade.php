@@ -114,18 +114,19 @@
             </div>
         @else
             <div class="table-card">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Transaksi</th>
-                            <th>Siswa</th>
-                            <th>Periode</th>
-                            <th>Metode</th>
-                            <th>Jumlah</th>
-                            <th>Status</th>
-                            <th>Waktu</th>
-                        </tr>
-                    </thead>
+                <div class="table-responsive">
+                    <table style="min-width: 750px;">
+                        <thead>
+                            <tr>
+                                <th>Transaksi</th>
+                                <th>Siswa</th>
+                                <th>Periode</th>
+                                <th>Metode</th>
+                                <th>Jumlah</th>
+                                <th>Status</th>
+                                <th>Waktu</th>
+                            </tr>
+                        </thead>
                     <tbody>
                         @foreach ($pembayarans as $p)
                             @php
@@ -209,6 +210,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             </div>
 
             {{-- PAGINATION --}}

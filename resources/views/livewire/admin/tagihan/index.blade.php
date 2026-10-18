@@ -133,8 +133,8 @@
 
     {{-- ── TABLE ──────────────────────────────────────────── --}}
     <div class="table-card" style="border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,0.06); overflow:hidden;">
-        <div style="overflow-x:auto;">
-        <table style="width:100%; table-layout:auto; border-collapse:collapse;">
+        <div class="table-responsive">
+        <table style="width:100%; min-width:920px; table-layout:auto; border-collapse:collapse;">
             <thead>
                 <tr style="background:linear-gradient(135deg,rgba(6,95,70,0.08),rgba(16,185,129,0.04)); border-bottom:2px solid rgba(6,95,70,0.12);">
                     <th style="text-align:left; padding:14px 20px; font-size:11px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; color:var(--em-700); min-width:200px;">Santri</th>

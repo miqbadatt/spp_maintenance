@@ -286,6 +286,7 @@
                     Lihat semua →
                 </a>
             </div>
+            <div class="table-responsive">
             <table style="width:100%; border-collapse:collapse;">
                 <tbody>
                     @forelse ($tagihanMenunggu as $t)
@@ -318,6 +319,7 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
         </div>
 
         {{-- PEMBAYARAN TERBARU --}}
@@ -329,6 +331,7 @@
                     <p class="text-muted" style="font-size:12px; margin-top:2px;">5 transaksi masuk terakhir</p>
                 </div>
             </div>
+            <div class="table-responsive">
             <table style="width:100%; border-collapse:collapse;">
                 <tbody>
                     @forelse ($pembayaranTerbaru as $p)
@@ -371,6 +374,7 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
         </div>
 
     </div>

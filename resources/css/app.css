@@ -443,17 +443,67 @@ body {
     border-color: rgba(0, 0, 0, 0.1);
 }
 
-/* ─── TABLE CARD ─── */
+/* ─── TABLE CARD & RESPONSIVE SCROLL ─── */
 .table-card {
     background: var(--surface-card);
     border-radius: var(--r-xl);
     border: 1px solid rgba(0, 0, 0, 0.06);
     overflow: hidden;
+    position: relative;
+    max-width: 100%;
+}
+
+.table-responsive,
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(6, 95, 70, 0.25) transparent;
+}
+
+.table-responsive::-webkit-scrollbar,
+.table-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track,
+.table-scroll::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 999px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb,
+.table-scroll::-webkit-scrollbar-thumb {
+    background: rgba(6, 95, 70, 0.2);
+    border-radius: 999px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover,
+.table-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(6, 95, 70, 0.4);
 }
 
 .table-card table {
     width: 100%;
     border-collapse: collapse;
+}
+
+.table-responsive table,
+.table-scroll table {
+    min-width: 650px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .table-card:has(> table) {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .table-card > table {
+        min-width: 600px;
+    }
 }
 
 .table-card th {
@@ -466,6 +516,7 @@ body {
     text-align: left;
     background: var(--surface);
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    white-space: nowrap;
 }
 
 .table-card td {

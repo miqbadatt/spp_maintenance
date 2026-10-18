@@ -289,7 +289,8 @@
                 </div>
             @else
                 <div class="table-card">
-                    <table>
+                    <div class="table-responsive">
+                    <table style="min-width: 900px;">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -364,6 +365,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                 </div>
 
                 <div style="display: flex; justify-content: center; margin-top: 8px;">

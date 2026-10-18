@@ -247,7 +247,8 @@
                 </div>
 
                 <div class="table-card">
-                    <table>
+                    <div class="table-responsive">
+                    <table style="min-width: 600px;">
                         <thead>
                             <tr>
                                 <th>Siswa</th>
@@ -275,23 +276,23 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <span style="font-size: 13px; font-weight: 500;">
+                                        <span style="font-size: 13px; font-weight: 500; white-space: nowrap;">
                                             {{ $p->tagihan->bulan }} {{ $p->tagihan->tahun }}
                                         </span>
                                     </td>
                                     <td>
-                                        <span style="font-size: 12.5px; color: var(--ink-muted);">
+                                        <span style="font-size: 12.5px; color: var(--ink-muted); white-space: nowrap;">
                                             {{ $p->metode_bayar ?? '—' }}
                                         </span>
                                     </td>
                                     <td>
                                         <span class="amount"
-                                            style="font-size: 13.5px; font-weight: 600; color: var(--em-700);">
+                                            style="font-size: 13.5px; font-weight: 600; color: var(--em-700); white-space: nowrap;">
                                             Rp {{ number_format($p->jumlah_bayar, 0, ',', '.') }}
                                         </span>
                                     </td>
                                     <td>
-                                        <span style="font-size: 12px; color: var(--ink-muted);">
+                                        <span style="font-size: 12px; color: var(--ink-muted); white-space: nowrap;">
                                             {{ ($p->waktu_pembayaran ?? $p->created_at)->format('d M Y, H:i') }}
                                         </span>
                                     </td>
@@ -299,6 +300,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
         @endif
